@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Phạm Minh Lộc — Video Editor & Photographer. Chuyên về chỉnh sửa video điện ảnh, chụp ảnh sự kiện, chân dung tại Việt Nam." />
+  <meta name="author" content="Phạm Minh Lộc" />
+  <meta property="og:title" content="Phạm Minh Lộc — Video Editor & Photographer" />
+  <meta property="og:type" content="website" />
+  <title>Phạm Minh Lộc — Video Editor & Photographer</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Video Modal */
+    #video-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.97);
+      z-index: 9500;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.4s, visibility 0.4s;
+    }
+    #video-modal.open { opacity: 1; visibility: visible; }
+    .video-modal-inner {
+      position: relative; width: 90vw; max-width: 960px; aspect-ratio: 16/9; background: #000;
+    }
+    .video-modal-inner iframe { width: 100%; height: 100%; border: none; }
+    .video-modal-close {
+      position: absolute; top: -3rem; right: 0;
+      background: none; border: 1px solid rgba(232,160,69,0.4);
+      color: #f0ebe3; font-size: 1.2rem;
+      width: 40px; height: 40px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .video-modal-close:hover { border-color: #e8a045; color: #e8a045; }
+    @media (max-width: 768px) { .portfolio-grid { grid-template-columns: 1fr !important; } }
+    @media (min-width: 769px) and (max-width: 1024px) { .portfolio-grid { grid-template-columns: 1fr 1fr !important; } }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-follower"></div>
+
+  <canvas id="particles-canvas" aria-hidden="true" style="position: fixed; inset: 0; z-index: -2; pointer-events: none;"></canvas>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="loader-text">Phạm Minh <span>Lộc</span></div>
+    <div class="loader-bar"></div>
+    <div class="loader-percent" id="loader-percent">Đang tải...</div>
+  </div>
+
+  <!-- VIDEO MODAL -->
+  <div id="video-modal" role="dialog" aria-modal="true" aria-label="Video player">
+    <div class="video-modal-inner">
+      <button class="video-modal-close" id="video-modal-close" aria-label="Close video">&#10005;</button>
+      <iframe id="video-modal-iframe" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <img class="lightbox-img" id="lightbox-img" src="" alt="Portfolio image" />
+    <button class="lightbox-close" id="lightbox-close" aria-label="Close lightbox">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <a href="#hero" class="nav-logo">PML <span>Studio</span></a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#about">Về tôi</a></li>
+      <li><a href="#skills">Kỹ năng</a></li>
+      <li><a href="#portfolio">Dự án</a></li>
+      <li><a href="#services">Dịch vụ</a></li>
+      <li><a href="#contact" class="nav-cta">Liên hệ</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero" aria-label="Hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Video Editor &amp; Photographer</p>
+      <h1 class="hero-title">
+        <span class="hero-title-line">Phạm Minh</span>
+        <span class="hero-title-line italic">Lộc</span>
+      </h1>
+      <p class="hero-subtitle">
+        Tôi tạo ra những thước phim &amp; khoảnh khắc&nbsp;
+        <span class="hero-typewriter" id="typewriter"></span>
+      </p>
+      <div class="hero-actions">
+        <a href="#portfolio" class="btn-primary" id="hero-view-btn">
+          <span>Xem tác phẩm</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+        <a href="#contact" class="btn-secondary" id="hero-contact-btn">
+          <span>Liên hệ ngay</span>
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <div class="scroll-line"></div>
+      <span class="scroll-text">Cuộn</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" aria-label="About">
+    <div class="section-container">
+      <div class="about-grid">
+        <div class="about-image-wrap reveal-left">
+          <div class="about-image">
+            <img src="images/LOC.png" alt="Phạm Minh Lộc — Video Editor & Photographer" loading="lazy" />
+          </div>
+          <div class="about-badge">
+            <span class="about-badge-num">1+</span>
+            <span class="about-badge-text">Năm<br>Kinh nghiệm</span>
+          </div>
+        </div>
+        <div class="about-content reveal-right">
+          <p class="section-label">Về tôi</p>
+          <h2 class="section-title">Sinh viên FPT<br><em>nhưng không chỉ thế.</em></h2>
+          <div class="divider"></div>
+          <p>Tôi là Phạm Minh Lộc — Sinh viên ngành Software Engineering tại FPT University (2022–2026), với đam mê thực sự dành cho Video Editing, Photography và Digital Marketing. Về nhiếp ảnh, tôi yêu thích màu sắc Moody, Cinematic &amp; Dark Luxury, nhưng đồng thời luôn linh hoạt chụp <strong>đa dạng phong cách</strong> và không bao giờ giới hạn bản thân trong một khuôn mẫu cố định nào.</p>
+          <p>Từ quá trình thực tập tại Dai-ichi Life, GomTất đến Idea Hub Marketing — tôi đã trau dồi kinh nghiệm thực chiến với <strong>Premiere Pro, After Effects, Photoshop, Lightroom, CapCut</strong> và tự xây dựng kênh <a href="https://www.tiktok.com/@locdichup?_r=1&_t=ZS-98d3szCI3d7" target="_blank" rel="noopener" style="color: var(--amber); text-decoration: underline;">TikTok cá nhân</a> (tự lên nội dung, quay, chụp và edit). Hiện tại là một Freelancer linh hoạt, tôi luôn sẵn sàng làm việc Part-time với thái độ chuyên nghiệp, cầu tiến và sáng tạo nhất.</p>
+          <div class="about-stats">
+            <div class="stat-item">
+              <div class="stat-num"><span class="counter" data-target="1">0</span><sup>+</sup></div>
+              <div class="stat-label">Năm kinh nghiệm</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num"><span class="counter" data-target="20">0</span><sup>+</sup></div>
+              <div class="stat-label">Dự án hoàn thành</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">IELTS</div>
+              <div class="stat-label">6.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience" aria-label="Experience" style="padding:8rem 0; background:linear-gradient(180deg,var(--dark-2) 0%,var(--dark) 100%);">
+    <div class="section-container">
+      <div class="reveal" style="text-align:center; margin-bottom:4rem;">
+        <p class="section-label" style="justify-content:center;">Kinh nghiệm</p>
+        <h2 class="section-title" style="text-align:center;">Hành trình <em>thực chiến</em></h2>
+        <div class="divider" style="margin:1.5rem auto 0;"></div>
+      </div>
+
+      <div style="max-width:780px; margin:0 auto; position:relative;">
+        <!-- Timeline line -->
+        <div style="position:absolute;left:20px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(232,160,69,0.3),rgba(232,160,69,0.3),transparent);"></div>
+
+        <!-- Item 1 -->
+        <div class="reveal" style="display:flex;gap:2.5rem;margin-bottom:3rem;padding-left:3.5rem;position:relative;">
+          <div style="position:absolute;left:12px;top:6px;width:17px;height:17px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(232,160,69,0.5);flex-shrink:0;"></div>
+          <div class="service-card" style="flex:1;padding:1.8rem 2rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+              <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:400;">Thực tập sinh Marketing</h3>
+              <span style="font-size:0.75rem;color:var(--amber);border:1px solid rgba(232,160,69,0.3);padding:0.2rem 0.7rem;border-radius:20px;white-space:nowrap;">07/2025 - 08/2025</span>
+            </div>
+            <p style="color:var(--amber);font-size:0.85rem;margin-bottom:1rem;opacity:0.8;">Dai-ichi Life Việt Nam</p>
+            <ul style="color:var(--gray);font-size:0.85rem;line-height:1.9;list-style:none;padding:0;">
+              <li>&#9656; Dựng &amp; chỉnh sửa video bằng Adobe Premiere, After Effects</li>
+              <li>&#9656; Thiết kế poster, hình ảnh bằng Photoshop</li>
+              <li>&#9656; Quản lý Fanpage Facebook, xây dựng nội dung truyền thông</li>
+              <li>&#9656; Quay, dựng video TikTok &amp; thiết kế Landing Page (Ladipage)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="reveal" style="display:flex;gap:2.5rem;margin-bottom:3rem;padding-left:3.5rem;position:relative;">
+          <div style="position:absolute;left:12px;top:6px;width:17px;height:17px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(232,160,69,0.5);"></div>
+          <div class="service-card" style="flex:1;padding:1.8rem 2rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+              <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:400;">Thực tập sinh Marketing</h3>
+              <span style="font-size:0.75rem;color:var(--amber);border:1px solid rgba(232,160,69,0.3);padding:0.2rem 0.7rem;border-radius:20px;white-space:nowrap;">08/2025 - 10/2025</span>
+            </div>
+            <p style="color:var(--amber);font-size:0.85rem;margin-bottom:1rem;opacity:0.8;">Công ty GomTất</p>
+            <ul style="color:var(--gray);font-size:0.85rem;line-height:1.9;list-style:none;padding:0;">
+              <li>&#9656; Editor video cho TikTok, Facebook, Shopee</li>
+              <li>&#9656; Viết kịch bản video theo trend và insight khách hàng</li>
+              <li>&#9656; Ứng dụng công cụ AI để tối ưu quy trình sản xuất video</li>
+              <li>&#9656; Thiết kế hình ảnh cơ bản bằng CapCut, Canva</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="reveal" style="display:flex;gap:2.5rem;margin-bottom:3rem;padding-left:3.5rem;position:relative;">
+          <div style="position:absolute;left:12px;top:6px;width:17px;height:17px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(232,160,69,0.5);"></div>
+          <div class="service-card" style="flex:1;padding:1.8rem 2rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+              <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:400;">Media Marketing</h3>
+              <span style="font-size:0.75rem;color:var(--amber);border:1px solid rgba(232,160,69,0.3);padding:0.2rem 0.7rem;border-radius:20px;white-space:nowrap;">11/2025 - 12/2025</span>
+            </div>
+            <p style="color:var(--amber);font-size:0.85rem;margin-bottom:1rem;opacity:0.8;">Idea Hub Marketing</p>
+            <ul style="color:var(--gray);font-size:0.85rem;line-height:1.9;list-style:none;padding:0;">
+              <li>&#9656; Quay chụp, dựng video phục vụ nội dung truyền thông</li>
+              <li>&#9656; Editor video cho các nền tảng mạng xã hội</li>
+              <li>&#9656; Quản lý Fanpage, lên ý tưởng và triển khai nội dung Media</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Item 4 - Current -->
+        <div class="reveal" style="display:flex;gap:2.5rem;padding-left:3.5rem;position:relative;">
+          <div style="position:absolute;left:8px;top:4px;width:25px;height:25px;border-radius:50%;background:rgba(232,160,69,0.2);border:2px solid var(--amber);box-shadow:0 0 20px rgba(232,160,69,0.4);animation:pulse 2s infinite;"></div>
+          <div class="service-card" style="flex:1;padding:1.8rem 2rem;border-color:rgba(232,160,69,0.35);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;">
+              <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:400;">Freelance Video Editor</h3>
+              <span style="font-size:0.75rem;color:#4ade80;border:1px solid rgba(74,222,128,0.3);padding:0.2rem 0.7rem;border-radius:20px;white-space:nowrap;">&#x2022; 10/2025 - Hiện tại</span>
+            </div>
+            <p style="color:var(--amber);font-size:0.85rem;margin-bottom:1rem;opacity:0.8;">Freelancer</p>
+            <ul style="color:var(--gray);font-size:0.85rem;line-height:1.9;list-style:none;padding:0;">
+              <li>&#9656; Nhận dự án chỉnh sửa video theo yêu cầu khách hàng</li>
+              <li>&#9656; Sản xuất nội dung cho TikTok, Facebook, Instagram</li>
+              <li>&#9656; Chuyên gia color grading phong cách Moody &amp; Cinematic</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="skills" aria-label="Skills">
+    <div class="section-container">
+      <div class="reveal">
+        <p class="section-label">Kỹ năng</p>
+        <h2 class="section-title">Công cụ &amp; <em>Chuyên môn</em></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="skills-grid">
+        <div class="reveal">
+          <p class="skill-category-label">&#127909; Video Editing</p>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Adobe Premiere Pro</span><span class="skill-pct">95%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="95"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Adobe After Effects</span><span class="skill-pct">85%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Motion Graphics</span><span class="skill-pct">75%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="75"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Audio Mixing &amp; SFX</span><span class="skill-pct">70%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="70"></div></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <p class="skill-category-label">&#128247; Photography</p>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Chụp Chân Dung</span><span class="skill-pct">90%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="90"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Chụp ảnh Cưới</span><span class="skill-pct">85%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Adobe Lightroom</span><span class="skill-pct">92%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="92"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Adobe Photoshop / Retouch</span><span class="skill-pct">85%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="85"></div></div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-header"><span class="skill-name">Chụp ảnh Thời trang &#9654; Đang học</span><span class="skill-pct">55%</span></div>
+            <div class="skill-bar"><div class="skill-fill" data-width="55"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="software-grid reveal" style="margin-top:3rem;">
+        <span class="sw-tag">Premiere Pro</span>
+        <span class="sw-tag">After Effects</span>
+        <span class="sw-tag">Lightroom</span>
+        <span class="sw-tag">Photoshop</span>
+        <span class="sw-tag">Capcut Pro</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="portfolio" aria-label="Portfolio">
+    <div class="section-container">
+      <div class="reveal">
+        <p class="section-label">Tác phẩm</p>
+        <h2 class="section-title">Dự án <em>nổi bật</em></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="portfolio-filter reveal">
+        <button class="filter-btn active" data-filter="all" id="filter-all">Tất cả</button>
+        <button class="filter-btn" data-filter="photo" id="filter-photo">Photography</button>
+        <button class="filter-btn" data-filter="video" id="filter-video">Video</button>
+      </div>
+
+      
+
+      <div class="portfolio-grid" id="portfolio-grid">
+
+        <!-- PHOTOS -->
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Anhfixed.jpg" tabindex="0" role="button" aria-label="Photo 1">
+          <img src="images/Anhfixed.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series I</h3></div>
+        </div>
+        <div class="portfolio-item wide reveal" data-category="photo" data-src="images/DamCuoiAnhTung-.png" tabindex="0" role="button" aria-label="Photo 2">
+          <img src="images/DamCuoiAnhTung-.png" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series II</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Anhfixeddj.jpg" tabindex="0" role="button" aria-label="Photo 3">
+          <img src="images/Anhfixeddj.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series III</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/mauNham3.1.jpg" tabindex="0" role="button" aria-label="Photo 4">
+          <img src="images/mauNham3.1.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series IV</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/mauNham4.1.jpg" tabindex="0" role="button" aria-label="Photo 5">
+          <img src="images/mauNham4.1.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series V</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/mauNham5.1.jpg" tabindex="0" role="button" aria-label="Photo 6">
+          <img src="images/mauNham5.1.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series VI</h3></div>
+        </div>
+        <div class="portfolio-item wide reveal" data-category="photo" data-src="images/MeoMeo-.png" tabindex="0" role="button" aria-label="Photo 7">
+          <img src="images/MeoMeo-.png" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series VII</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_9453.jpg" tabindex="0" role="button" aria-label="Photo 8">
+          <img src="images/IMG_9453.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series VIII</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0079.jpg" tabindex="0" role="button" aria-label="Photo 9">
+          <img src="images/IMG_0079.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series IX</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0086.jpg" tabindex="0" role="button" aria-label="Photo 10">
+          <img src="images/IMG_0086.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series X</h3></div>
+        </div>
+        <div class="portfolio-item wide reveal" data-category="photo" data-src="images/IMG_0093.jpg" tabindex="0" role="button" aria-label="Photo 11">
+          <img src="images/IMG_0093.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XI</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0101.jpg" tabindex="0" role="button" aria-label="Photo 12">
+          <img src="images/IMG_0101.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XII</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0105.jpg" tabindex="0" role="button" aria-label="Photo 13">
+          <img src="images/IMG_0105.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XIII</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0106.jpg" tabindex="0" role="button" aria-label="Photo 14">
+          <img src="images/IMG_0106.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XIV</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_0117.jpg" tabindex="0" role="button" aria-label="Photo 15">
+          <img src="images/IMG_0117.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XV</h3></div>
+        </div>
+        <div class="portfolio-item wide reveal" data-category="photo" data-src="images/Koi1.jpg" tabindex="0" role="button" aria-label="Photo 16">
+          <img src="images/Koi1.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi I</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Koi2.jpg" tabindex="0" role="button" aria-label="Photo 17">
+          <img src="images/Koi2.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi II</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Koi3.jpg" tabindex="0" role="button" aria-label="Photo 18">
+          <img src="images/Koi3.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi III</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Koi4.jpg" tabindex="0" role="button" aria-label="Photo 19">
+          <img src="images/Koi4.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi IV</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/Koi5.jpg" tabindex="0" role="button" aria-label="Photo 20">
+          <img src="images/Koi5.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi V</h3></div>
+        </div>
+        <div class="portfolio-item wide reveal" data-category="photo" data-src="images/Koi6.jpg" tabindex="0" role="button" aria-label="Photo 21">
+          <img src="images/Koi6.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Koi VI</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_9953.jpg" tabindex="0" role="button" aria-label="Photo 22">
+          <img src="images/IMG_9953.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XVI</h3></div>
+        </div>
+        <div class="portfolio-item reveal" data-category="photo" data-src="images/IMG_9973.jpg" tabindex="0" role="button" aria-label="Photo 23">
+          <img src="images/IMG_9973.jpg" alt="Photography by Phạm Minh Lộc" loading="eager" />
+          <div class="portfolio-overlay"><span class="portfolio-tag">Photography</span><h3 class="portfolio-name">Series XVII</h3></div>
+        </div>
+
+        <!-- VIDEOS -->
+        <div class="portfolio-item video-item wide reveal" data-category="video" data-video="images/FinalVid1.mp4" tabindex="0" role="button" aria-label="Video 1">
+          <video src="images/FinalVid1.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 01</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="portfolio-item video-item reveal" data-category="video" data-video="images/LaamCafe12.mp4" tabindex="0" role="button" aria-label="Video 2">
+          <video src="images/LaamCafe12.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 02</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="portfolio-item video-item reveal" data-category="video" data-video="images/MatchaLatteVuGia1.mp4" tabindex="0" role="button" aria-label="Video 3">
+          <video src="images/MatchaLatteVuGia1.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 03</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="portfolio-item video-item wide reveal" data-category="video" data-video="images/TheSong3_19.12.2025.mp4" tabindex="0" role="button" aria-label="Video 4">
+          <video src="images/TheSong3_19.12.2025.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 04</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="portfolio-item video-item reveal" data-category="video" data-video="images/YeeTea5_11.12.2025.mp4" tabindex="0" role="button" aria-label="Video 5">
+          <video src="images/YeeTea5_11.12.2025.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 05</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+        <div class="portfolio-item video-item reveal" data-category="video" data-video="images/BEHOMEMALLASMR3.mp4" tabindex="0" role="button" aria-label="Video 6">
+          <video src="images/BEHOMEMALLASMR3.mp4" preload="metadata" muted playsinline style="width:100%;height:100%;object-fit:cover;pointer-events:none;" tabindex="-1"></video>
+          <div class="portfolio-overlay"><span class="portfolio-tag">Video Edit</span><h3 class="portfolio-name">Edit 06</h3></div>
+          <div class="portfolio-video-btn" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+    </div>
+  </section>
+</section>
+
+  <!-- MY PROCESS -->
+  <section id="process" aria-label="My Process" style="padding:8rem 0; background: var(--dark);">
+    <div class="section-container">
+      <div class="reveal" style="text-align:center; margin-bottom:4rem;">
+        <p class="section-label" style="justify-content:center;">Quy trình làm việc</p>
+        <h2 class="section-title" style="text-align:center;">Quy trình <em>sáng tạo</em></h2>
+        <div class="divider" style="margin:1.5rem auto 0;"></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; position:relative;">
+
+        <!-- Connector line -->
+        <div style="position:absolute; top:52px; left:12.5%; right:12.5%; height:1px; background:linear-gradient(to right, transparent, rgba(232,160,69,0.4), rgba(232,160,69,0.4), transparent); z-index:0;"></div>
+
+        <!-- Step 1 -->
+        <div class="reveal service-card" style="text-align:center; padding:2.5rem 1.5rem; position:relative; z-index:1;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(232,160,69,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:var(--amber);font-family:var(--font-display);font-size:1.5rem;font-weight:300;">01</div>
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;margin-bottom:0.8rem;">Brief</h3>
+          <p style="color:var(--gray);font-size:0.85rem;line-height:1.7;">Tiếp nhận yêu cầu, hiểu rõ mục tiêu và phong cách cần tạo ra.</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="reveal service-card" style="text-align:center; padding:2.5rem 1.5rem; position:relative; z-index:1; transition-delay:0.1s;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(232,160,69,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:var(--amber);font-family:var(--font-display);font-size:1.5rem;font-weight:300;">02</div>
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;margin-bottom:0.8rem;">Concept</h3>
+          <p style="color:var(--gray);font-size:0.85rem;line-height:1.7;">Lên ý tưởng, lập kế hoạch shot list, storyboard hoặc mood board.</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="reveal service-card" style="text-align:center; padding:2.5rem 1.5rem; position:relative; z-index:1; transition-delay:0.2s;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--amber-dim);border:1px solid rgba(232,160,69,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:var(--amber);font-family:var(--font-display);font-size:1.5rem;font-weight:300;">03</div>
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;margin-bottom:0.8rem;">Production</h3>
+          <p style="color:var(--gray);font-size:0.85rem;line-height:1.7;">Quay phim / chụp ảnh và chỉnh sửa hậu kỳ với color grade điện ảnh.</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="reveal service-card" style="text-align:center; padding:2.5rem 1.5rem; position:relative; z-index:1; transition-delay:0.3s;">
+          <div style="width:64px;height:64px;border-radius:50%;background:rgba(232,160,69,0.25);border:1px solid var(--amber);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;color:var(--amber);font-family:var(--font-display);font-size:1.5rem;font-weight:300;">04</div>
+          <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:400;margin-bottom:0.8rem;">Delivery</h3>
+          <p style="color:var(--gray);font-size:0.85rem;line-height:1.7;">Bàn giao sản phẩm đúng deadline, hỗ trợ revision và feedback.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- SERVICES -->
+  <section id="services" aria-label="Services">
+    <div class="section-container">
+      <div class="reveal">
+        <p class="section-label">Dịch vụ</p>
+        <h2 class="section-title">Tôi có thể<br><em>làm gì cho bạn?</em></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+          </div>
+          <h3 class="service-title">Video Editing</h3>
+          <p class="service-desc">Chỉnh sửa video chuyên nghiệp với phong cách điện ảnh — từ cắt ghép, màu sắc đến motion graphics.</p>
+          <ul class="service-list">
+            <li>Music Video / Short Film</li>
+            <li>Social Media Content</li>
+            <li>Brand &amp; Commercial Video</li>
+            <li>Reels / TikTok / YouTube</li>
+            <li>Event Highlight</li>
+          </ul>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </div>
+          <h3 class="service-title">Photography</h3>
+          <p class="service-desc">Chụp ảnh với ánh mắt nghệ thuật — tạo nên những khung hình đẹp, chân thực và đầy cảm xúc.</p>
+          <ul class="service-list">
+            <li>Portrait &amp; Chụp Chân Dung</li>
+            <li>Wedding Photography</li>
+            <li>Fashion Photography</li>
+            <li>Event &amp; Concert Photo</li>
+            <li>Post-processing / Retouch</li>
+          </ul>
+        </div>
+        <div class="service-card reveal">
+          <div class="service-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a10 10 0 0 1 0 20"/>
+              <path d="M12 6a6 6 0 0 1 0 12"/>
+            </svg>
+          </div>
+          <h3 class="service-title">Color Grading</h3>
+          <p class="service-desc">Định hình màu sắc và tone điện ảnh cho video &amp; ảnh — tạo phong cách thương hiệu độc đáo.</p>
+          <ul class="service-list">
+            <li>Cinematic LUT Creation</li>
+            <li>Color Correction</li>
+            <li>Photo Preset / LUT Pack</li>
+            <li>Film &amp; Moody Grade</li>
+            <li>Batch Photo Editing</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" aria-label="Contact">
+    <div class="section-container">
+      <div class="reveal">
+        <p class="section-label">Liên hệ</p>
+        <h2 class="section-title">Hãy cùng<br><em>tạo nên điều gì đó.</em></h2>
+        <div class="divider"></div>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info reveal-left">
+          <h3>Sẵn sàng hợp tác.</h3>
+          <p>Dù bạn cần một video điện ảnh ấn tượng hay những tấm ảnh đẹp cho thương hiệu — tôi ở đây để biến ý tưởng của bạn thành hiện thực.</p>
+          <div class="contact-links">
+            <a href="mailto:locphamminh2004@gmail.com" class="contact-link-item" id="email-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              locphamminh2004@gmail.com
+            </a>
+            <a href="https://zalo.me/0825113786" target="_blank" rel="noopener" class="contact-link-item" id="phone-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.51a16 16 0 0 0 6.29 6.29l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              Zalo: 0825 113 786
+            </a>
+            <a href="#" class="contact-link-item" id="location-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Hồ Chí Minh, Việt Nam
+            </a>
+          </div>
+          <div class="social-row">
+            <a href="https://www.instagram.com/_sb710_/" target="_blank" rel="noopener" class="social-link" id="instagram-link" aria-label="Instagram">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+            <a href="https://www.facebook.com/vera.urko.7/" target="_blank" rel="noopener" class="social-link" id="facebook-link" aria-label="Facebook">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+            <a href="https://www.tiktok.com/@locdichup?_r=1&_t=ZS-98d3szCI3d7" target="_blank" rel="noopener" class="social-link" id="tiktok-link" aria-label="TikTok">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.19 8.19 0 0 0 4.79 1.54V6.78a4.85 4.85 0 0 1-1.02-.09z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        <form class="contact-form reveal-right" id="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-name">Tên của bạn</label>
+              <input type="text" id="form-name" name="name" placeholder="Nguyễn Văn A" required />
+            </div>
+            <div class="form-group">
+              <label for="form-email">Email</label>
+              <input type="email" id="form-email" name="email" placeholder="email@example.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="form-service">Dịch vụ cần</label>
+            <select id="form-service" name="service">
+              <option value="">Chọn dịch vụ...</option>
+              <option value="video">Video Editing</option>
+              <option value="photo">Photography</option>
+              <option value="color">Color Grading</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="form-message">Mô tả dự án</label>
+            <textarea id="form-message" name="message" placeholder="Bạn cần tôi làm gì? Mô tả chi tiết dự án của bạn..." required></textarea>
+          </div>
+          <button type="submit" class="btn-submit" id="btn-submit">Gửi yêu cầu &#8594;</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">Phạm Minh Lộc</span>
+    <p class="footer-copy">&#169; 2024 PML Studio. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
