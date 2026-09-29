@@ -1,0 +1,25 @@
+# Raw camera files - không cần cho web
+*.CR2
+*.cr2
+*.RAW
+*.raw
+*.NEF
+*.ARW
+
+# Script files tao dùng tạm
+fix.js
+fix2.js
+fix3.js
+fix_video_thumbs.js
+apply_local_media.js
+apply_all_photos.js
+rebuild_portfolio.js
+restore.js
+compress_images.ps1
+convert_cr2.ps1
+extract_cr2_jpeg.ps1
+test_cr2.ps1
+
+# Misc
+.DS_Store
+Thumbs.db
